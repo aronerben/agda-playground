@@ -1,4 +1,4 @@
-module depend where
+module algebra where
 
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
@@ -66,17 +66,17 @@ plusAssociative (suc a) b c =
     suc (a + (b + c))
   ∎
 
-plusCommutativeAux : ∀ a b -> a + suc b ≡ suc (a + b)
+plusCommutativeLemma : ∀ a b -> a + suc b ≡ suc (a + b)
 -- Goal: suc b ≡ suc b
 -- Follows from reflexivity
-plusCommutativeAux zero b = refl
+plusCommutativeLemma zero b = refl
 -- Goal: suc (a + suc b) ≡ suc (suc (a + b))
 -- Inductive step
 -- Follows from induction assumption and congruence
-plusCommutativeAux (suc a) b =
+plusCommutativeLemma (suc a) b =
   begin
     suc (a + suc b)
-  ≡⟨ cong suc (plusCommutativeAux a b) ⟩
+  ≡⟨ cong suc (plusCommutativeLemma a b) ⟩
     suc (suc (a + b))
   ∎
 
@@ -107,12 +107,12 @@ plusCommutative zero (suc b) =
 plusCommutative (suc a) (suc b) =
   begin
     suc (a + suc b)
-  ≡⟨ cong suc (plusCommutativeAux a b) ⟩
+  ≡⟨ cong suc (plusCommutativeLemma a b) ⟩
     suc (suc (a + b))
   ≡⟨ cong suc (cong suc (plusCommutative a b)) ⟩
     suc (suc (b + a))
     -- Need to invoke symmetry since definitional equivalence does not guarantee it
-  ≡⟨ cong suc (sym (plusCommutativeAux b a)) ⟩
+  ≡⟨ cong suc (sym (plusCommutativeLemma b a)) ⟩
     suc (b + suc a)
   ∎
 
