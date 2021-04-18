@@ -2,7 +2,7 @@ module induction where
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
-open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
+open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
 
 -- -------------------------------
 -- (zero + n) + p ≡ zero + (n + p)
@@ -223,7 +223,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
     suc (n + (m + m * n))
   ≡⟨ cong suc (sym (+-assoc n m (m * n))) ⟩
     suc ((n + m) + m * n)
-  ≡⟨ cong (λ {x → suc (x + m * n)}) (+-comm n m) ⟩
+  ≡⟨ cong (λ {term → suc (term + m * n)}) (+-comm n m) ⟩
     suc ((m + n) + m * n)
   ≡⟨ cong suc (+-assoc m n (m * n)) ⟩
     suc (m + (n + m * n))
@@ -252,3 +252,145 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
   ≡⟨⟩
     suc n * m
   ∎
+
+-- 6)
+0∸n≡0 : ∀ (n : ℕ) → zero ∸ n ≡ zero
+0∸n≡0 zero =
+  begin
+    zero ∸ zero
+  ≡⟨⟩
+    zero
+  ∎
+0∸n≡0 (suc n) =
+  begin
+    zero ∸ suc n
+  ≡⟨⟩
+    zero
+  ∎
+-- No induction needed, just prove it holds for 0 and for suc n. (Holds because of definition of ∸)
+
+-- 7)
+0∸n≡0∸n+p : ∀ (n p : ℕ) → zero ∸ n ≡ zero ∸ (n + p)
+0∸n≡0∸n+p n zero  =
+  begin
+    zero ∸ n
+  ≡⟨ cong (zero ∸_) (sym (+-identityʳ n)) ⟩
+    zero ∸ (n + zero)
+  ∎
+0∸n≡0∸n+p n (suc p)  =
+  begin
+    zero ∸ n
+  ≡⟨ 0∸n≡0 n ⟩
+    zero
+  ≡⟨⟩
+    zero ∸ suc (n + p)
+  ≡⟨ cong (zero ∸_) (sym (+-suc n p)) ⟩
+    zero ∸ (n + suc p)
+  ∎
+
+∸-+-assoc : ∀ (m n p : ℕ) → (m ∸ n) ∸ p ≡ m ∸ (n + p)
+∸-+-assoc zero n p =
+  begin
+    (zero ∸ n) ∸ p
+  ≡⟨ cong (_∸ p) (0∸n≡0 n) ⟩
+    zero ∸ p
+  ≡⟨ 0∸n≡0 p ⟩
+    zero
+  ≡⟨ sym (0∸n≡0 n) ⟩
+    zero ∸ n
+  ≡⟨  0∸n≡0∸n+p n p ⟩
+    zero ∸ (n + p)
+  ∎
+∸-+-assoc (suc m) zero p =
+  begin
+    (suc m ∸ zero) ∸ p
+  ≡⟨⟩
+    suc m ∸ (zero + p)
+  ∎
+∸-+-assoc (suc m) (suc n) p =
+  begin
+    (suc m ∸ suc n) ∸ p
+  ≡⟨⟩
+    (m ∸ n) ∸ p
+  ≡⟨ ∸-+-assoc m n p ⟩
+    m ∸ (n + p)
+  ≡⟨⟩
+    suc m ∸ suc (n + p)
+  ≡⟨⟩
+    suc m ∸ (suc n + p)
+  ∎
+
+-- 8)
+*-identityˡ : ∀ (n : ℕ) -> 1 * n ≡ n
+*-identityˡ n =
+  begin
+    1 * n
+  ≡⟨⟩
+    (suc zero) * n
+  ≡⟨⟩
+    n + (zero * n)
+  ≡⟨⟩
+    n + zero
+  ≡⟨ +-identityʳ n ⟩
+    n
+  ∎
+
+^-distribˡ-+-* : ∀ (m n p : ℕ) → m ^ (n + p) ≡ (m ^ n) * (m ^ p)
+^-distribˡ-+-* m zero p =
+  begin
+    m ^ (zero + p)
+  ≡⟨⟩
+    m ^ p
+  ≡⟨ sym (*-identityˡ (m ^ p)) ⟩
+    1 * m ^ p
+  ≡⟨⟩
+    (m ^ zero) * (m ^ p)
+  ∎
+^-distribˡ-+-* m (suc n) p =
+  begin
+    m ^ (suc n + p)
+  ≡⟨⟩
+    m ^ suc (n + p)
+  ≡⟨⟩
+    m * (m ^ (n + p))
+  ≡⟨ cong (m *_) (^-distribˡ-+-* m n p) ⟩
+    m * (m ^ n * m ^ p)
+  ≡⟨ sym (*-assoc m (m ^ n) (m ^ p)) ⟩
+    (m * m ^ n) * m ^ p
+  ≡⟨⟩
+    (m ^ suc n) * (m ^ p)
+  ∎
+
+
+^-distribʳ-* : ∀ (m n p : ℕ) → (m * n) ^ p ≡ (m ^ p) * (n ^ p)
+^-distribʳ-* m n zero =
+  begin
+    (m * n) ^ zero
+  ≡⟨⟩
+    1
+  ≡⟨⟩
+    1 * 1
+  ≡⟨⟩
+    (m ^ zero) * (n ^ zero)
+  ∎
+^-distribʳ-* m n (suc p) =
+  begin
+    (m * n) ^ (suc p)
+  ≡⟨⟩
+    (m * n) * (m * n) ^ p
+  ≡⟨ cong ((m * n) *_) (^-distribʳ-* m n p) ⟩
+    (m * n) * ((m ^ p) * (n ^ p))
+  ≡⟨ *-assoc m n (m ^ p * n ^ p) ⟩
+    ((m * n) * (m ^ p)) * (n ^ p)
+  ≡⟨ cong (_* (n ^ p)) (*-assoc m n (m ^ p)) ⟩
+    (m * (n * (m ^ p))) * (n ^ p)
+  ≡⟨ cong (λ {term -> (m * term) * (n ^ p)}) (*-comm n (m ^ p)) ⟩
+    (m * ((m ^ p) * n)) * (n ^ p)
+  ≡⟨ cong (_* (n ^ p)) (sym (*-assoc m (m ^ p) n)) ⟩
+    (m * (m ^ p) * n) * (n ^ p)
+  ≡⟨ {!!} ⟩
+    (m ^ suc p) * (n ^ suc p)
+  ∎
+
+^-*-assoc : ∀ (m n p : ℕ) → (m ^ n) ^ p ≡ m ^ (n * p)
+^-*-assoc m n p = {!!}
