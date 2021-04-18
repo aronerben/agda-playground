@@ -201,16 +201,16 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
     zero
   ∎
 
-*-suc : ∀ (m n : ℕ) → m * suc n ≡ m + n * m
+*-suc : ∀ (m n : ℕ) → m * suc n ≡ m + m * n
 *-suc zero n =
   begin
     zero * (suc n)
   ≡⟨⟩
     zero
-  ≡⟨ sym (+-absorbingʳ n) ⟩
-    n * zero
   ≡⟨⟩
-    zero + n * zero
+    zero * n
+  ≡⟨⟩
+    zero + zero * n
   ∎
 *-suc (suc m) n =
   begin
@@ -218,27 +218,37 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_)
   ≡⟨⟩
     (suc n) + (m * suc n)
   ≡⟨ cong ((suc n) +_) (*-suc m n) ⟩
-    (suc n) + (m + n * m)
+    (suc n) + (m + m * n)
   ≡⟨⟩
-    suc (n + (suc n * m))
-  ≡⟨ {!!} ⟩
-    suc m + n * suc m
+    suc (n + (m + m * n))
+  ≡⟨ cong suc (sym (+-assoc n m (m * n))) ⟩
+    suc ((n + m) + m * n)
+  ≡⟨ cong (λ {x → suc (x + m * n)}) (+-comm n m) ⟩
+    suc ((m + n) + m * n)
+  ≡⟨ cong suc (+-assoc m n (m * n)) ⟩
+    suc (m + (n + m * n))
+  ≡⟨⟩
+    suc (m + (suc m * n))
+  ≡⟨⟩
+    suc m + suc m * n
   ∎
 
 *-comm : ∀ (m n : ℕ) → m * n ≡ n * m
-*-comm zero n =
+*-comm m zero =
   begin
-    zero * n
-  ≡⟨⟩
+    m * zero
+  ≡⟨ +-absorbingʳ m ⟩
     zero
-  ≡⟨ sym (+-absorbingʳ n)⟩
-    n * zero
-  ∎
-*-comm (suc m) n =
-  begin
-    suc m * n
   ≡⟨⟩
-    n + m * n
-  ≡⟨ {!!} ⟩
-    n * suc m
+    zero * m
+  ∎
+*-comm m (suc n) =
+  begin
+    m * suc n
+  ≡⟨ *-suc m n ⟩
+    m + m * n
+  ≡⟨ cong (m +_) (*-comm m n) ⟩
+    m + n * m
+  ≡⟨⟩
+    suc n * m
   ∎
