@@ -183,19 +183,19 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
   ∎
 
 -- 5)
-+-absorbingʳ : ∀ (m : ℕ) → m * zero ≡ zero
-+-absorbingʳ zero =
+*-absorbingʳ : ∀ (m : ℕ) → m * zero ≡ zero
+*-absorbingʳ zero =
   begin
     zero * zero
   ≡⟨⟩
     zero
   ∎
-+-absorbingʳ (suc m) =
+*-absorbingʳ (suc m) =
   begin
     suc m * zero
   ≡⟨⟩
     zero + m * zero
-  ≡⟨ cong (zero +_) (+-absorbingʳ m) ⟩
+  ≡⟨ cong (zero +_) (*-absorbingʳ m) ⟩
     zero + zero
   ≡⟨⟩
     zero
@@ -237,7 +237,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
 *-comm m zero =
   begin
     m * zero
-  ≡⟨ +-absorbingʳ m ⟩
+  ≡⟨ *-absorbingʳ m ⟩
     zero
   ≡⟨⟩
     zero * m
@@ -380,7 +380,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
     (m * n) * (m * n) ^ p
   ≡⟨ cong ((m * n) *_) (^-distribʳ-* m n p) ⟩
     (m * n) * ((m ^ p) * (n ^ p))
-  ≡⟨ *-assoc m n (m ^ p * n ^ p) ⟩
+  ≡⟨ sym (*-assoc (m * n) (m ^ p) (n ^ p)) ⟩
     ((m * n) * (m ^ p)) * (n ^ p)
   ≡⟨ cong (_* (n ^ p)) (*-assoc m n (m ^ p)) ⟩
     (m * (n * (m ^ p))) * (n ^ p)
@@ -388,9 +388,99 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
     (m * ((m ^ p) * n)) * (n ^ p)
   ≡⟨ cong (_* (n ^ p)) (sym (*-assoc m (m ^ p) n)) ⟩
     (m * (m ^ p) * n) * (n ^ p)
-  ≡⟨ {!!} ⟩
+  ≡⟨ *-assoc (m * (m ^ p)) n (n ^ p) ⟩
+    m * (m ^ p) * (n * (n ^ p))
+  ≡⟨⟩
     (m ^ suc p) * (n ^ suc p)
   ∎
 
 ^-*-assoc : ∀ (m n p : ℕ) → (m ^ n) ^ p ≡ m ^ (n * p)
-^-*-assoc m n p = {!!}
+^-*-assoc m n zero =
+  begin
+    (m ^ n) ^ zero
+  ≡⟨⟩
+    1
+  ≡⟨⟩
+    m ^ zero
+  ≡⟨ cong (m ^_) (sym (*-absorbingʳ n)) ⟩
+    m ^ (n * zero)
+  ∎
+^-*-assoc m n (suc p) =
+  begin
+    (m ^ n) ^ suc p
+  ≡⟨⟩
+    (m ^ n) * (m ^ n) ^ p
+  ≡⟨ cong ((m ^ n) *_) (^-*-assoc m n p) ⟩
+    (m ^ n) * (m ^ (n * p))
+  ≡⟨ cong (λ {term -> (m ^ n) * (m ^ term)}) (*-comm n p) ⟩
+    (m ^ n) * (m ^ (p * n))
+  ≡⟨ sym (^-distribˡ-+-* m n (p * n)) ⟩
+    m ^ (n + p * n)
+  ≡⟨⟩
+    m ^ (suc p * n)
+  ≡⟨ cong (m ^_) (*-comm (suc p) n) ⟩
+    m ^ (n * suc p)
+  ∎
+
+-- 9)
+data Bin : Set where
+  - : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc - = - I
+inc (rest O) = rest I
+inc (rest I) = (inc rest) O
+
+to : ℕ → Bin
+to zero = - O
+to (suc n) = inc (to n)
+
+from : Bin → ℕ
+from - = 0
+from (rest O) = 2 * from rest
+from (rest I) = 2 * from rest + 1
+
+bin-inverse : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+bin-inverse - = refl
+bin-inverse (b O) =
+  begin
+    from (inc (b O))
+  ≡⟨⟩
+    from (b I)
+  ≡⟨⟩
+    2 * from b + 1
+  ≡⟨ +-comm (2 * from b) 1 ⟩
+    suc (2 * from b)
+  ≡⟨⟩
+    suc (from (b O))
+  ∎
+bin-inverse (b I) =
+  begin
+    from (inc (b I))
+  ≡⟨⟩
+    from ((inc b) O)
+  ≡⟨⟩
+    2 * from (inc b)
+  ≡⟨ cong (2 *_) (bin-inverse b) ⟩
+    2 * suc (from b)
+  ≡⟨ *-comm 2 (suc (from b)) ⟩
+     suc (from b) * 2
+  ≡⟨⟩
+    (1 + from b) * 2
+  ≡⟨ *-distrib-+ 1 (from b) 2 ⟩
+    1 * 2 + from b * 2
+  ≡⟨ cong (1 * 2 +_) (*-comm (from b) 2) ⟩
+    1 * 2 + 2 * from b
+  ≡⟨⟩
+    2 + 2 * from b
+  ≡⟨⟩
+    suc 1 + 2 * from b
+  ≡⟨⟩
+    suc (1 + 2 * from b)
+  ≡⟨ cong (suc) (+-comm 1 (2 * from b)) ⟩
+    suc (2 * from b + 1)
+  ≡⟨⟩
+    suc (from (b I))
+  ∎
