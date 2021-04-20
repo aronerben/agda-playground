@@ -486,11 +486,10 @@ bin-inverse-suc-inc (b I) =
   ∎
 
 -- ∀ (b : Bin) → to (from b) ≡ b
--- This does not work, as the terminal value constructor "-" constructs something of type Bin which has no equivalent in type ℕ.
--- No bijection can be constructed between Bin and ℕ without making "from" a partial function.
--- "to" is not a left inverse to "from"
+-- This does not work, as "from" is a surjective function. Both "-" and "- O" from Bin map into 0 from ℕ. Surjective functions have no left inverse.
+-- 0 would have to map into two values, making the inverse of "from" not a function.
 
--- "to" is an injective, total function into Bin, since "-" is never hit by any value in ℕ, but every value in ℕ has exactly one corresponding Bin value.
--- This makes "from" a left inverse to "to".
+-- This works, as "to" is an injective function. 0 from ℕ maps (according to our definition) into "- O" in Bin. Injective functions have a left inverse.
+-- "from" is a left inverse to "to". Note that there are infinitely many left inverses, since "-" could be mapped to any value in ℕ.
 from∘to≡idₗ : ∀ (n : ℕ) → from (to n) ≡ n
 from∘to≡idₗ n = {!!}
