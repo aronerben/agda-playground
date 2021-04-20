@@ -442,9 +442,9 @@ from - = 0
 from (rest O) = 2 * from rest
 from (rest I) = 2 * from rest + 1
 
-bin-inverse : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
-bin-inverse - = refl
-bin-inverse (b O) =
+bin-inverse-suc-inc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+bin-inverse-suc-inc - = refl
+bin-inverse-suc-inc (b O) =
   begin
     from (inc (b O))
   ≡⟨⟩
@@ -456,14 +456,14 @@ bin-inverse (b O) =
   ≡⟨⟩
     suc (from (b O))
   ∎
-bin-inverse (b I) =
+bin-inverse-suc-inc (b I) =
   begin
     from (inc (b I))
   ≡⟨⟩
     from ((inc b) O)
   ≡⟨⟩
     2 * from (inc b)
-  ≡⟨ cong (2 *_) (bin-inverse b) ⟩
+  ≡⟨ cong (2 *_) (bin-inverse-suc-inc b) ⟩
     2 * suc (from b)
   ≡⟨ *-comm 2 (suc (from b)) ⟩
      suc (from b) * 2
@@ -484,3 +484,13 @@ bin-inverse (b I) =
   ≡⟨⟩
     suc (from (b I))
   ∎
+
+-- ∀ (b : Bin) → to (from b) ≡ b
+-- This does not work, as the terminal value constructor "-" constructs something of type Bin which has no equivalent in type ℕ.
+-- No bijection can be constructed between Bin and ℕ without making "from" a partial function.
+-- "to" is not a left inverse to "from"
+
+-- "to" is an injective, total function into Bin, since "-" is never hit by any value in ℕ, but every value in ℕ has exactly one corresponding Bin value.
+-- This makes "from" a left inverse to "to".
+from∘to≡idₗ : ∀ (n : ℕ) → from (to n) ≡ n
+from∘to≡idₗ n = {!!}
