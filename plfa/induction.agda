@@ -443,7 +443,24 @@ from (rest O) = 2 * from rest
 from (rest I) = 2 * from rest + 1
 
 bin-inverse-suc-inc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
-bin-inverse-suc-inc - = refl
+bin-inverse-suc-inc - =
+  begin
+    from (inc -)
+  ≡⟨⟩
+    from (- I)
+  ≡⟨⟩
+    2 * from - + 1
+  ≡⟨⟩
+    2 * 0 + 1
+  ≡⟨⟩
+    0 + 1
+  ≡⟨⟩
+    1
+  ≡⟨⟩
+    suc 0
+  ≡⟨⟩
+    suc (from -)
+  ∎
 bin-inverse-suc-inc (b O) =
   begin
     from (inc (b O))
@@ -492,4 +509,25 @@ bin-inverse-suc-inc (b I) =
 -- This works, as "to" is an injective function. 0 from ℕ maps (according to our definition) into "- O" in Bin. Injective functions have a left inverse.
 -- "from" is a left inverse to "to". Note that there are infinitely many left inverses, since "-" could be mapped to any value in ℕ.
 from∘to≡idₗ : ∀ (n : ℕ) → from (to n) ≡ n
-from∘to≡idₗ n = {!!}
+from∘to≡idₗ zero =
+  begin
+    from (to zero)
+  ≡⟨⟩
+    from (- O)
+  ≡⟨⟩
+    2 * from -
+  ≡⟨⟩
+    2 * 0
+  ≡⟨⟩
+    zero
+  ∎
+from∘to≡idₗ (suc n) =
+  begin
+    from (to (suc n))
+  ≡⟨⟩
+    from (inc (to n))
+  ≡⟨ bin-inverse-suc-inc (to n) ⟩
+    suc (from (to n))
+  ≡⟨ cong suc (from∘to≡idₗ n) ⟩
+    suc n
+  ∎
