@@ -321,7 +321,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
   ∎
 
 -- 8)
-*-identityˡ : ∀ (n : ℕ) -> 1 * n ≡ n
+*-identityˡ : ∀ (n : ℕ) → 1 * n ≡ n
 *-identityˡ n =
   begin
     1 * n
@@ -384,7 +384,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
     ((m * n) * (m ^ p)) * (n ^ p)
   ≡⟨ cong (_* (n ^ p)) (*-assoc m n (m ^ p)) ⟩
     (m * (n * (m ^ p))) * (n ^ p)
-  ≡⟨ cong (λ {term -> (m * term) * (n ^ p)}) (*-comm n (m ^ p)) ⟩
+  ≡⟨ cong (λ {term → (m * term) * (n ^ p)}) (*-comm n (m ^ p)) ⟩
     (m * ((m ^ p) * n)) * (n ^ p)
   ≡⟨ cong (_* (n ^ p)) (sym (*-assoc m (m ^ p) n)) ⟩
     (m * (m ^ p) * n) * (n ^ p)
@@ -412,7 +412,7 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
     (m ^ n) * (m ^ n) ^ p
   ≡⟨ cong ((m ^ n) *_) (^-*-assoc m n p) ⟩
     (m ^ n) * (m ^ (n * p))
-  ≡⟨ cong (λ {term -> (m ^ n) * (m ^ term)}) (*-comm n p) ⟩
+  ≡⟨ cong (λ {term → (m ^ n) * (m ^ term)}) (*-comm n p) ⟩
     (m ^ n) * (m ^ (p * n))
   ≡⟨ sym (^-distribˡ-+-* m n (p * n)) ⟩
     m ^ (n + p * n)
