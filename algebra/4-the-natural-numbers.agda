@@ -95,5 +95,5 @@ gaussian-sum (suc n) =
   ≡⟨ cong (λ {term → ⌊ suc n * term /2⌋}) (+-comm 2 n) ⟩
     ⌊ suc n * (n + 2) /2⌋ 
   ≡⟨ cong (λ {term → ⌊ suc n * term /2⌋}) (+-suc n 1) ⟩
-    ⌊ suc n * suc (n + 1) /2⌋ 
+    ⌊ suc n * (suc n + 1) /2⌋ 
   ∎
