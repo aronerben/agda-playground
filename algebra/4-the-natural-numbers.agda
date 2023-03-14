@@ -6,9 +6,13 @@ open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
 open import Data.Nat using (ℕ; zero; suc; _+_; _*_; ⌊_/2⌋)
 
 -- 4)
---sum-to-n : ℕ → ℕ
---sum-to-n n = sum (upTo (suc n))
-open import Data.Nat.Properties using (*-comm; *-distribʳ-+; +-suc; +-comm; *-distribˡ-+)
+open import Data.Nat.Properties using (
+  *-comm
+  ; *-distribʳ-+
+  ; +-suc
+  ; +-comm
+  ; *-distribˡ-+
+  )
 
 1+⋯+n : ℕ → ℕ
 1+⋯+n zero = zero
@@ -51,13 +55,18 @@ rearrange-lemma n =
   ∎
 
 even+even≡even : ∀ {m n : ℕ} → IsEven m → IsEven n → IsEven (m + n)
-even+even≡even (even k) (even i) rewrite (sym (*-distribʳ-+ 2 k i)) = even (k + i)
+even+even≡even (even k) (even i) rewrite (sym (*-distribʳ-+ 2 k i)) =
+               even (k + i)
 
 [1+n]*n≡even : ∀ (n : ℕ) → IsEven (suc n * n)
 [1+n]*n≡even zero = even 0
-[1+n]*n≡even (suc n) rewrite rearrange-lemma n = even+even≡even (even (suc n)) ([1+n]*n≡even n) 
+[1+n]*n≡even (suc n) rewrite rearrange-lemma n =
+             even+even≡even (even (suc n)) ([1+n]*n≡even n) 
 
-even/2+even/2≡[even+even]/2 : ∀ {m n : ℕ} → IsEven m → IsEven n → ⌊ m /2⌋ + ⌊ n /2⌋ ≡ ⌊ m + n /2⌋
+even/2+even/2≡[even+even]/2 : ∀ {m n : ℕ}
+                             → IsEven m
+                             → IsEven n
+                             → ⌊ m /2⌋ + ⌊ n /2⌋ ≡ ⌊ m + n /2⌋
 even/2+even/2≡[even+even]/2 (even k) (even i) =
   begin
     ⌊ k * 2 /2⌋ + ⌊ i * 2 /2⌋
@@ -95,5 +104,33 @@ gaussian-sum (suc n) =
   ≡⟨ cong (λ {term → ⌊ suc n * term /2⌋}) (+-comm 2 n) ⟩
     ⌊ suc n * (n + 2) /2⌋ 
   ≡⟨ cong (λ {term → ⌊ suc n * term /2⌋}) (+-suc n 1) ⟩
+    ⌊ suc n * (suc n + 1) /2⌋ 
+  ∎
+
+
+gaussian-sum' : ∀ (n : ℕ) → 1+⋯+n n ≡ ⌊ n * (n + 1) /2⌋
+gaussian-sum' zero = refl
+gaussian-sum' (suc n) =
+  begin
+    1+⋯+n (suc n)
+  ≡⟨⟩
+    suc n + 1+⋯+n n
+  ≡⟨ {!!} ⟩
+    suc n + ⌊ n * (n + 1) /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * 2 /2⌋ + ⌊ n * (n + 1) /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * 2 /2⌋ + ⌊ n * (1 + n) /2⌋
+  ≡⟨⟩
+    ⌊ suc n * 2 /2⌋ + ⌊ n * suc n /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * 2 /2⌋ + ⌊ suc n * n /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * 2 + suc n * n /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * (2 + n) /2⌋
+  ≡⟨ {!!} ⟩
+    ⌊ suc n * (n + 2) /2⌋ 
+  ≡⟨ {!!} ⟩
     ⌊ suc n * (suc n + 1) /2⌋ 
   ∎
